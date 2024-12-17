@@ -6,8 +6,22 @@ import skimage.io as io
 from torchvision import transforms
 import numpy as np
 import scipy.io as scio
+import argparse
+import os
 
 from modelNetM import EncoderNet, DecoderNet, ClassNet, EPELoss
+
+
+pr = argparse.ArgumentParser()
+pr.add_argument('modelspath', type=str)
+pr.add_argument('imgspath', type=str)
+pr.add_argument('flowpath', type=str)
+args = pr.parse_args()
+
+models_path = args.modelspath
+imgs_path = args.imgspath
+flow_path = args.flowpath
+
 
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
@@ -27,22 +41,23 @@ if torch.cuda.is_available():
     model_class = model_class.cuda()
 
 
-model_en.load_state_dict(torch.load('model_en.pkl'))
-model_de.load_state_dict(torch.load('model_de.pkl'))
-model_class.load_state_dict(torch.load('model_class.pkl'))
+model_en.load_state_dict(torch.load(os.path.join(models_path, 'model_en.pkl')), strict=False)
+model_de.load_state_dict(torch.load(os.path.join(models_path, 'model_de.pkl')), strict=False)
+model_class.load_state_dict(torch.load(os.path.join(models_path, 'model_class.pkl')), strict=False)
 
 model_en.eval()
 model_de.eval()
 model_class.eval()  
 
-testImgPath = '/home/xliea/Dataset256/Dataset256/test/distorted'
-saveFlowPath = '/home/xliea/test/flow_256/flow_cla'
+testImgPath = imgs_path
+saveFlowPath = flow_path
 
 correct = 0
-for index, types in enumerate(['barrel','pincushion','rotation','shear','projective','wave']):
-    for k in range(50000,55000):
+#for index, types in enumerate(['barrel','pincushion','rotation','shear','projective','wave']):
+for index, types in enumerate(['barrel', 'rotation', 'shear', 'wave']):
+    for k in range(0, 1):
 
-        imgPath = '%s%s%s%s%s%s' % (testImgPath, '/',types,'_', str(k).zfill(6), '.jpg')
+        imgPath = '%s%s%s%s%s%s' % (testImgPath, '/', types, '_', str(k).zfill(6), '.jpg')
         disimgs = io.imread(imgPath)
         disimgs = transform(disimgs)
         
@@ -64,6 +79,5 @@ for index, types in enumerate(['barrel','pincushion','rotation','shear','project
         u = flow_output.data.cpu().numpy()[0][0]
         v = flow_output.data.cpu().numpy()[0][1]
 
-        saveMatPath =  '%s%s%s%s%s%s' % (saveFlowPath, '/',types,'_', str(k).zfill(6), '.mat')
-        scio.savemat(saveMatPath, {'u': u,'v': v}) 
-
+        saveMatPath =  '%s%s%s%s%s%s' % (saveFlowPath, '/', types, '_', str(k).zfill(6), '.mat')
+        scio.savemat(saveMatPath, {'u': u,'v': v})
