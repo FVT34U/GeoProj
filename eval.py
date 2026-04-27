@@ -42,9 +42,9 @@ if torch.cuda.is_available():
     model_class = model_class.cuda()
 
 
-model_en.load_state_dict(torch.load(os.path.join(models_path, 'model_en.pkl')), strict=True)
-model_de.load_state_dict(torch.load(os.path.join(models_path, 'model_de.pkl')), strict=True)
-model_class.load_state_dict(torch.load(os.path.join(models_path, 'model_class.pkl')), strict=True)
+model_en.load_state_dict(torch.load(os.path.join(models_path, 'model_en_last.pkl')), strict=True)
+model_de.load_state_dict(torch.load(os.path.join(models_path, 'model_de_last.pkl')), strict=True)
+model_class.load_state_dict(torch.load(os.path.join(models_path, 'model_class_last.pkl')), strict=True)
 
 model_en.eval()
 model_de.eval()
@@ -54,11 +54,12 @@ testImgPath = imgs_path
 saveFlowPath = flow_path
 
 correct = 0
-for index, types in enumerate(['barrel','pincushion','rotation','shear','projective','wave']):
+#for index, types in enumerate(['barrel','pincushion','rotation','shear','projective','wave']):
 #for index, types in enumerate(['barrel', 'rotation', 'shear', 'wave']):
-    for k in range(0, 1):
+for index, types in enumerate(['distorted']):
+    for k in range(6, 7):
 
-        imgPath = '%s%s%s%s%s%s' % (testImgPath, '\\', types, '_', str(k).zfill(6), '.jpg')
+        imgPath = '%s%s%s%s%s%s' % (testImgPath, '\\', types, '_', str(k).zfill(6), '.png')
         disimgs = PIL.Image.open(imgPath).convert('RGB')
         #img_npy = np.asarray(disimgs.resize((128, 128))) # your resolution
         img_npy = np.asarray(disimgs)
@@ -86,7 +87,7 @@ for index, types in enumerate(['barrel','pincushion','rotation','shear','project
         res_img, re_mask = rectification(img_npy, flow_output.data.cpu().numpy()[0])
         img_out = PIL.Image.fromarray(res_img)
         #img_out = img_out.resize((128, 128)) # your resolution
-        img_out.save(f'imgs/result_{types}.png')
+        img_out.save(f'output/result_{types}.png')
 
         saveMatPath =  '%s%s%s%s%s%s' % (saveFlowPath, '/', types, '_', str(k).zfill(6), '.mat')
         scio.savemat(saveMatPath, {'u': u,'v': v})

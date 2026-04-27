@@ -1,4 +1,15 @@
 **/__pycache__
 venv/
+.venv/
+.matplotlib/
 models/
 imgs/
+
+dataset_01/
+dataset_02/
+dataset_test_02/
+input_image/
+input_images/
+output/
+loss_log.csv
+log.txt

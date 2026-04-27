@@ -1,3 +1,4 @@
+numpy==1.26.4
 torch --index-url https://download.pytorch.org/whl/cu124
 torchvision --index-url https://download.pytorch.org/whl/cu124
 torchaudio --index-url https://download.pytorch.org/whl/cu124
@@ -5,3 +6,4 @@ tensorflow
 scipy
 scikit-image
 numba
+matplotlib

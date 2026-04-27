@@ -16,8 +16,8 @@ parser.add_argument('--lr', type=float, default=0.0001, metavar='LR')
 parser.add_argument('--data_num', type=int, default=50000, metavar='N')
 parser.add_argument('--batch_size', type=int, default=32, metavar='N')
 parser.add_argument("--dataset_dir", type=str, default='/home/xliea/GeoProj/Dataset/Dataset_256')
-parser.add_argument("--distortion_type", type=list, default=['barrel','pincushion','shear','rotation','projective','wave'])
-#parser.add_argument("--distortion_type", type=list, default=['pincushion', 'projective'])
+#parser.add_argument("--distortion_type", type=list, default=['barrel','pincushion','shear','rotation','projective','wave'])
+parser.add_argument("--distortion_type", type=list, default=['distorted'])
 #parser.add_argument("--distortion_type", type=list, default=['barrel','shear','rotation','wave'])
 args = parser.parse_args()
 
@@ -76,9 +76,10 @@ model_en.train()
 model_de.train()
 model_class.train()
 
-with open('loss_log.csv', 'a') as log_file:
+with open('models/loss_log.csv', 'a') as log_file:
     log_file.write('epoch,loss,loss1,loss2\n')
-    for epoch in range(args.epochs):
+    from tqdm import tqdm
+    for epoch in tqdm(range(args.epochs)):
         #print(f'epoch {epoch}')
         for i, (disimgs, disx, disy, labels) in enumerate(train_loader):
             #print(f'enumerate {i}')
@@ -110,7 +111,8 @@ with open('loss_log.csv', 'a') as log_file:
             loss.backward()
             optimizer.step()
             
-            print("Epoch [%d], Iter [%d], Loss: %.4f, Loss1: %.4f, Loss2: %.4f" %(epoch + 1, i + 1, loss.item(), loss1.item(), loss2.item()))
+            #print("Epoch [%d], Iter [%d], Loss: %.4f, Loss1: %.4f, Loss2: %.4f" %(epoch + 1, i + 1, loss.item(), loss1.item(), loss2.item()))
+            tqdm.write("Epoch [%d], Iter [%d], Loss: %.4f, Loss1: %.4f, Loss2: %.4f" %(epoch + 1, i + 1, loss.item(), loss1.item(), loss2.item()))
             log_file.write(f'{epoch},{loss.item()},{loss1.item()},{loss2.item()}\n')
             
             #============ TensorBoard logging ============#
